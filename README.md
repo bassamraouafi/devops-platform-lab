@@ -2,57 +2,60 @@
 
 A production-oriented DevOps laboratory demonstrating how to build, secure, containerize, deploy and monitor a cloud-native application.
 
-The goal of this project is to demonstrate a complete DevOps lifecycle, from source code to deployment and observability.
+This repository starts with a small FastAPI service and a working CI foundation. The next stages are container publishing, Helm deployment, GitOps, and observability.
 
----
+## What is in place
 
-## 🎯 Project Objective
+- REST API with a welcome endpoint and a health check
+- Automated endpoint tests with pytest
+- GitHub Actions workflow that runs the tests on pushes and pull requests
+- Dockerfile for running the API as a container
 
-This project implements a small REST API and focuses on the DevOps platform around the application.
+## Run locally
 
-The platform will demonstrate:
+Requires Python 3.12 or newer.
 
-- CI/CD automation
-- Automated testing
-- Code quality analysis
-- Security scanning
-- Containerization
-- Container image management
-- Kubernetes/OpenShift deployment
-- Helm-based deployment
-- GitOps practices
-- Monitoring and observability
+```bash
+python -m venv .venv
+# Activate the environment:
+# macOS/Linux: source .venv/bin/activate
+# Windows PowerShell: .venv\\Scripts\\Activate.ps1
+python -m pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
 
----
+Open [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs) for interactive API docs, or call the health check:
 
-## 🏗️ Architecture
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+Expected response:
+
+```json
+{"status":"ok"}
+```
+
+Run the tests:
+
+```bash
+python -m pytest -q
+```
+
+## Run with Docker
+
+```bash
+docker build -t devops-platform-lab .
+docker run --rm -p 8000:8000 devops-platform-lab
+```
+
+Then visit [http://localhost:8000/health](http://localhost:8000/health).
+
+## Architecture
 
 ```text
-Developer
-    │
-    ▼
-  GitHub
-    │
-    ▼
-GitHub Actions
-    │
-    ├── Tests
-    ├── Code Quality
-    ├── Security Scan
-    └── Docker Build
-            │
-            ▼
-   Container Registry
-            │
-            ▼
-          Helm
-            │
-            ▼
-   Kubernetes / OpenShift
-            │
-       ┌────┴────┐
-       ▼         ▼
- Prometheus   Application
-       │
-       ▼
-    Grafana
+Developer -> GitHub -> GitHub Actions (tests) -> Docker image -> Kubernetes/Helm
+                                                        └----> monitoring (planned)
+```
+
+The current implementation covers the API, tests, and CI foundation. Container publishing, Kubernetes/Helm deployment, GitOps, and monitoring are planned follow-up stages.
